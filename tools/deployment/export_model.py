@@ -134,6 +134,28 @@ def parse_args():
     return args
 
 
+def get_mmdeploy_root(mmdeploy_dir):
+    """Get the root directory of mmdeploy.
+    
+    Args:
+        mmdeploy_dir: Optional path to mmdeploy directory
+        
+    Returns:
+        Path to mmdeploy root directory
+    """
+    if mmdeploy_dir:
+        return mmdeploy_dir
+    
+    try:
+        import mmdeploy
+        return osp.dirname(osp.dirname(mmdeploy.__file__))
+    except ImportError:
+        raise ImportError(
+            'MMDeploy is not installed. Please install it with: '
+            'pip install mmdeploy\n'
+            'Or specify --mmdeploy-dir to point to MMDeploy repository.')
+
+
 def get_deploy_config(format_type, task_type, precision, shape, mmdeploy_dir):
     """Get the deployment config file path based on parameters.
     
@@ -167,34 +189,18 @@ def get_deploy_config(format_type, task_type, precision, shape, mmdeploy_dir):
     
     config_name = f'{task_type}_{backend}{precision_str}{shape_str}{shape_range}.py'
     
+    # Get mmdeploy root directory once
+    mmdeploy_root = get_mmdeploy_root(mmdeploy_dir)
+    
     # Find config file
-    if mmdeploy_dir:
-        config_path = osp.join(mmdeploy_dir, 'configs', 'mmdet', 
-                              task_type, config_name)
-    else:
-        # Try to import mmdeploy and use its config
-        try:
-            import mmdeploy
-            mmdeploy_root = osp.dirname(osp.dirname(mmdeploy.__file__))
-            config_path = osp.join(mmdeploy_root, 'configs', 'mmdet',
-                                  task_type, config_name)
-        except ImportError:
-            raise ImportError(
-                'MMDeploy is not installed. Please install it with: '
-                'pip install mmdeploy\n'
-                'Or specify --mmdeploy-dir to point to MMDeploy repository.')
+    config_path = osp.join(mmdeploy_root, 'configs', 'mmdet', 
+                          task_type, config_name)
     
     if not osp.exists(config_path):
         # Try without shape range suffix
         config_name_simple = f'{task_type}_{backend}{precision_str}{shape_str}.py'
-        if mmdeploy_dir:
-            config_path = osp.join(mmdeploy_dir, 'configs', 'mmdet',
-                                  task_type, config_name_simple)
-        else:
-            import mmdeploy
-            mmdeploy_root = osp.dirname(osp.dirname(mmdeploy.__file__))
-            config_path = osp.join(mmdeploy_root, 'configs', 'mmdet',
-                                  task_type, config_name_simple)
+        config_path = osp.join(mmdeploy_root, 'configs', 'mmdet',
+                              task_type, config_name_simple)
     
     return config_path
 
@@ -213,7 +219,7 @@ def export_single_model(config_file, checkpoint_file, deploy_cfg,
         verbose: Enable verbose output
     """
     try:
-        from mmdeploy.apis import torch2onnx, torch2torchscript
+        from mmdeploy.apis import torch2onnx
         from mmdeploy.backend.sdk.export_info import export2SDK
     except ImportError:
         raise ImportError(
@@ -315,7 +321,7 @@ def main():
             # Try to infer checkpoint from config
             checkpoint_file = None
             print_log('Warning: No checkpoint specified. This may fail.',
-                     logger='current', level='WARNING')
+                     logger='current')
         
         # Create output directory for this model
         model_name = osp.splitext(osp.basename(config_file))[0]
