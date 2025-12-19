@@ -18,6 +18,7 @@ Example usage:
 """
 
 import argparse
+import logging
 import os
 import sys
 from pathlib import Path
@@ -28,13 +29,17 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from mmdet.wrappers import HydraWrapper
 from mmdet.utils import setup_cache_size_limit_of_dynamo
 
+# Setup logging
+logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
+logger = logging.getLogger(__name__)
+
 import wandb
 try:
     wandb.require("core")
     WANDB_AVAILABLE = True
 except Exception:
     WANDB_AVAILABLE = False
-    print("Warning: wandb not available or failed to initialize")
+    logger.warning("wandb not available or failed to initialize")
 
 
 def parse_args():
@@ -122,12 +127,12 @@ def main():
         # Use Hydra configuration
         config_path = args.config_path
         config_name = args.config_name
-        print(f"Using Hydra configuration: {config_path}/{config_name}.yaml")
+        logger.info(f"Using Hydra configuration: {config_path}/{config_name}.yaml")
     elif args.mm_config:
         # Use MM configuration directly
         config_path = args.mm_config
         config_name = None
-        print(f"Using MM configuration: {config_path}")
+        logger.info(f"Using MM configuration: {config_path}")
     else:
         raise ValueError(
             "Either --config-path and --config-name (for Hydra) or "
@@ -155,11 +160,11 @@ def main():
         config.optim_wrapper.loss_scale = 'dynamic'
     
     # Start training
-    print("Starting training...")
+    logger.info("Starting training...")
     results = wrapper.train(config)
     
-    print("Training completed!")
-    print(f"Results: {results}")
+    logger.info("Training completed!")
+    logger.info(f"Results: {results}")
 
 
 if __name__ == '__main__':

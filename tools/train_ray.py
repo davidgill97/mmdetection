@@ -20,6 +20,7 @@ Example usage:
 """
 
 import argparse
+import logging
 import os
 import sys
 import yaml
@@ -30,6 +31,10 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from mmdet.wrappers import RayWrapper
 from mmdet.utils import setup_cache_size_limit_of_dynamo
+
+# Setup logging
+logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
+logger = logging.getLogger(__name__)
 
 try:
     from ray import tune
@@ -42,7 +47,7 @@ try:
     WANDB_AVAILABLE = True
 except Exception:
     WANDB_AVAILABLE = False
-    print("Warning: wandb not available or failed to initialize")
+    logger.warning("wandb not available or failed to initialize")
 
 
 def parse_args():
@@ -235,19 +240,19 @@ def main():
     
     # Execute training
     if args.single_run:
-        print("Starting single training run...")
+        logger.info("Starting single training run...")
         config = wrapper.load_config()
         config.launcher = args.launcher
         results = wrapper.train_single(config)
-        print("Training completed!")
-        print(f"Results: {results}")
+        logger.info("Training completed!")
+        logger.info(f"Results: {results}")
     else:
-        print(f"Starting Ray Tune hyperparameter optimization with {args.num_samples} trials...")
-        print(f"Search space: {search_space}")
+        logger.info(f"Starting Ray Tune hyperparameter optimization with {args.num_samples} trials...")
+        logger.info(f"Search space: {search_space}")
         results = wrapper.train()
-        print("Hyperparameter tuning completed!")
-        print(f"Best configuration: {results['best_config']}")
-        print(f"Best metrics: {results['best_metrics']}")
+        logger.info("Hyperparameter tuning completed!")
+        logger.info(f"Best configuration: {results['best_config']}")
+        logger.info(f"Best metrics: {results['best_metrics']}")
 
 
 if __name__ == '__main__':

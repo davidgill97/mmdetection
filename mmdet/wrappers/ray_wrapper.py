@@ -40,6 +40,10 @@ class RayWrapper(BaseWrapper):
         metric (str): Metric to optimize.
         mode (str): Optimization mode ('min' or 'max').
         resources_per_trial (Optional[Dict]): Resources allocated per trial.
+        asha_max_t (int): Maximum iterations for ASHA scheduler. Default: 100.
+        asha_grace_period (int): Grace period for ASHA scheduler. Default: 10.
+        asha_reduction_factor (int): Reduction factor for ASHA. Default: 3.
+        max_concurrent_trials (int): Maximum concurrent trials for HyperOpt. Default: 4.
         **kwargs: Additional keyword arguments.
     """
     
@@ -54,6 +58,12 @@ class RayWrapper(BaseWrapper):
         metric: str = 'coco/bbox_mAP',
         mode: str = 'max',
         resources_per_trial: Optional[Dict] = None,
+        # ASHA scheduler parameters
+        asha_max_t: int = 100,
+        asha_grace_period: int = 10,
+        asha_reduction_factor: int = 3,
+        # Search algorithm parameters
+        max_concurrent_trials: int = 4,
         **kwargs
     ):
         if not RAY_AVAILABLE:
@@ -70,6 +80,14 @@ class RayWrapper(BaseWrapper):
         self.metric = metric
         self.mode = mode
         self.resources_per_trial = resources_per_trial or {"cpu": 1, "gpu": 0}
+        
+        # ASHA scheduler parameters
+        self.asha_max_t = asha_max_t
+        self.asha_grace_period = asha_grace_period
+        self.asha_reduction_factor = asha_reduction_factor
+        
+        # Search algorithm parameters
+        self.max_concurrent_trials = max_concurrent_trials
         
     def load_config(self) -> Config:
         """Load configuration from file.
@@ -134,9 +152,9 @@ class RayWrapper(BaseWrapper):
             return ASHAScheduler(
                 metric=self.metric,
                 mode=self.mode,
-                max_t=100,
-                grace_period=10,
-                reduction_factor=3
+                max_t=self.asha_max_t,
+                grace_period=self.asha_grace_period,
+                reduction_factor=self.asha_reduction_factor
             )
         elif self.scheduler_type == 'pbt':
             return PopulationBasedTraining(
@@ -159,7 +177,7 @@ class RayWrapper(BaseWrapper):
                 mode=self.mode
             )
             # Limit concurrent trials
-            search_alg = ConcurrencyLimiter(search_alg, max_concurrent=4)
+            search_alg = ConcurrencyLimiter(search_alg, max_concurrent=self.max_concurrent_trials)
             return search_alg
         return None
     
