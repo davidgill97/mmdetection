@@ -37,7 +37,12 @@ except ImportError:
     tune = None
 
 import wandb
-wandb.require("core")
+try:
+    wandb.require("core")
+    WANDB_AVAILABLE = True
+except Exception:
+    WANDB_AVAILABLE = False
+    print("Warning: wandb not available or failed to initialize")
 
 
 def parse_args():

@@ -172,16 +172,23 @@ class RayWrapper(BaseWrapper):
         Returns:
             Dict[str, Any]: Training metrics.
         """
-        # Load base config
-        cfg = self.get_mm_config().copy()
+        # Load base config (only once per wrapper instance)
+        if self._mm_config is None:
+            self._mm_config = self.load_config()
+        
+        # Create a copy for this trial
+        cfg = self._mm_config.copy()
         
         # Merge with hyperparameter updates
         cfg.merge_from_dict(config_updates)
         
         # Setup work directory for this trial
-        trial_dir = tune.get_trial_dir() if tune.is_session_enabled() else None
-        if trial_dir:
-            cfg.work_dir = trial_dir
+        if tune is not None:
+            trial_dir = tune.get_trial_dir() if tune.is_session_enabled() else None
+            if trial_dir:
+                cfg.work_dir = trial_dir
+            elif self.work_dir:
+                cfg.work_dir = self.work_dir
         elif self.work_dir:
             cfg.work_dir = self.work_dir
         
@@ -203,7 +210,7 @@ class RayWrapper(BaseWrapper):
             metrics = runner.train_loop.evaluator.metrics
         
         # Report metrics to Ray Tune
-        if tune.is_session_enabled():
+        if tune is not None and tune.is_session_enabled():
             tune.report(**metrics)
         
         return metrics

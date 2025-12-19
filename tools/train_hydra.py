@@ -29,7 +29,12 @@ from mmdet.wrappers import HydraWrapper
 from mmdet.utils import setup_cache_size_limit_of_dynamo
 
 import wandb
-wandb.require("core")
+try:
+    wandb.require("core")
+    WANDB_AVAILABLE = True
+except Exception:
+    WANDB_AVAILABLE = False
+    print("Warning: wandb not available or failed to initialize")
 
 
 def parse_args():

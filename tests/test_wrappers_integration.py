@@ -212,26 +212,26 @@ def test_hydra_optional():
             config = wrapper.load_config()
             print("✓ HydraWrapper works with MM config without Hydra")
         
-        # Test that it fails appropriately when trying to use Hydra config without Hydra
-        try:
-            import hydra
-            hydra_installed = True
-        except ImportError:
-            hydra_installed = False
-        
-        if not hydra_installed:
+            # Test that it fails appropriately when trying to use Hydra config without Hydra
             try:
-                wrapper = HydraWrapper(
-                    config_path='examples/hydra_configs',
-                    config_name='base_config',  # Hydra config
-                    work_dir=tmpdir
-                )
-                print("❌ Should have raised ImportError for Hydra config without Hydra")
-                return False
+                import hydra
+                hydra_installed = True
             except ImportError:
-                print("✓ Correctly raises ImportError when Hydra config used without Hydra")
-        else:
-            print("✓ Hydra is installed, skipping ImportError test")
+                hydra_installed = False
+            
+            if not hydra_installed:
+                try:
+                    wrapper = HydraWrapper(
+                        config_path='examples/hydra_configs',
+                        config_name='base_config',  # Hydra config
+                        work_dir=tmpdir
+                    )
+                    print("❌ Should have raised ImportError for Hydra config without Hydra")
+                    return False
+                except ImportError:
+                    print("✓ Correctly raises ImportError when Hydra config used without Hydra")
+            else:
+                print("✓ Hydra is installed, skipping ImportError test")
         
         print("✅ TEST 6 PASSED")
         return True

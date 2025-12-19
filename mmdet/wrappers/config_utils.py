@@ -7,6 +7,12 @@ from pathlib import Path
 from mmengine.config import Config
 
 
+import logging
+
+# Setup logger
+logger = logging.getLogger(__name__)
+
+
 class ConfigConverter:
     """Utility class for converting between different configuration formats.
     
@@ -218,7 +224,7 @@ class ConfigManager:
         
         for field in required_fields:
             if not hasattr(config, field):
-                print(f"Warning: Missing required field '{field}' in config")
+                logger.warning(f"Missing required field '{field}' in config")
                 return False
         
         return True
