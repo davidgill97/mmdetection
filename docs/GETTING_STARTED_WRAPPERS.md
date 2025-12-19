@@ -59,7 +59,7 @@ No new dependencies needed! Just use the new training script:
 
 ```bash
 python tools/train_hydra.py \
-    --mm-config configs/neurocle/deformable_detr/deformable_detr_r50_1xb2-15e_mnm.py \
+    --mm-config configs/detr/detr_r50_8xb2-150e_coco.py \
     --work-dir ./my_training
 ```
 
@@ -69,7 +69,7 @@ python tools/train_hydra.py \
 
 ```bash
 python tools/train_hydra.py \
-    --mm-config configs/neurocle/deformable_detr/deformable_detr_r50_1xb2-15e_mnm.py \
+    --mm-config configs/detr/detr_r50_8xb2-150e_coco.py \
     --overrides \
         optimizer.lr=0.0001 \
         data.train_batch_size=16 \
@@ -84,7 +84,7 @@ pip install ray[tune]
 
 # Run tuning
 python tools/train_ray.py \
-    --config configs/neurocle/deformable_detr/deformable_detr_r50_1xb2-15e_mnm.py \
+    --config configs/detr/detr_r50_8xb2-150e_coco.py \
     --num-samples 10 \
     --gpus-per-trial 1
 ```
@@ -105,7 +105,7 @@ python -c "from mmdet.wrappers import HydraWrapper; print('✓ Ready!')"
 2. **Run training**:
 ```bash
 python tools/train_hydra.py \
-    --mm-config configs/neurocle/deformable_detr/deformable_detr_r50_1xb2-15e_mnm.py \
+    --mm-config configs/detr/detr_r50_8xb2-150e_coco.py \
     --work-dir ./tutorial_1
 ```
 
@@ -166,7 +166,7 @@ cat examples/ray_tune_search_space.yaml
 3. **Run tuning**:
 ```bash
 python tools/train_ray.py \
-    --config configs/neurocle/deformable_detr/deformable_detr_r50_1xb2-15e_mnm.py \
+    --config configs/detr/detr_r50_8xb2-150e_coco.py \
     --search-space examples/ray_tune_search_space.yaml \
     --num-samples 5 \
     --gpus-per-trial 1 \
@@ -190,13 +190,13 @@ You want to try different learning rates quickly:
 ```bash
 # Try LR 1e-4
 python tools/train_hydra.py \
-    --mm-config configs/neurocle/deformable_detr/deformable_detr_r50_1xb2-15e_mnm.py \
+    --mm-config configs/detr/detr_r50_8xb2-150e_coco.py \
     --overrides optimizer.lr=0.0001 \
     --work-dir ./exp_lr_1e4
 
 # Try LR 2e-4
 python tools/train_hydra.py \
-    --mm-config configs/neurocle/deformable_detr/deformable_detr_r50_1xb2-15e_mnm.py \
+    --mm-config configs/detr/detr_r50_8xb2-150e_coco.py \
     --overrides optimizer.lr=0.0002 \
     --work-dir ./exp_lr_2e4
 ```
@@ -225,7 +225,7 @@ optim_wrapper.optimizer.weight_decay:
 2. **Run search**:
 ```bash
 python tools/train_ray.py \
-    --config configs/neurocle/deformable_detr/deformable_detr_r50_1xb2-15e_mnm.py \
+    --config configs/detr/detr_r50_8xb2-150e_coco.py \
     --search-space my_search.yaml \
     --num-samples 20 \
     --scheduler asha
@@ -240,7 +240,7 @@ from mmdet.wrappers import HydraWrapper
 
 # Initialize
 wrapper = HydraWrapper(
-    config_path='configs/neurocle/deformable_detr/deformable_detr_r50_1xb2-15e_mnm.py',
+    config_path='configs/detr/detr_r50_8xb2-150e_coco.py',
     work_dir='./my_experiment'
 )
 

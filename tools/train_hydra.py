@@ -14,7 +14,7 @@ Example usage:
         wandb.project=my_project work_dir=./my_work_dir
     
     # Using MM config directly
-    python tools/train_hydra.py --mm-config configs/neurocle/detr/detr_r50_1xb2-15e_mnm.py
+    python tools/train_hydra.py --mm-config configs/detr/detr_r50_8xb2-150e_coco.py
 """
 
 import argparse

@@ -60,7 +60,7 @@ python tools/train_hydra.py \
 #### Using MM Config Directly
 ```bash
 python tools/train_hydra.py \
-    --mm-config configs/neurocle/deformable_detr/deformable_detr_r50_1xb2-15e_mnm.py \
+    --mm-config configs/detr/detr_r50_8xb2-150e_coco.py \
     --work-dir ./my_work_dir
 ```
 
@@ -71,7 +71,7 @@ Ray Tune enables scalable hyperparameter optimization with various search algori
 #### Basic Tuning
 ```bash
 python tools/train_ray.py \
-    --config configs/neurocle/deformable_detr/deformable_detr_r50_1xb2-15e_mnm.py \
+    --config configs/detr/detr_r50_8xb2-150e_coco.py \
     --num-samples 20 \
     --metric coco/bbox_mAP \
     --gpus-per-trial 1
@@ -80,7 +80,7 @@ python tools/train_ray.py \
 #### With Custom Search Space
 ```bash
 python tools/train_ray.py \
-    --config configs/neurocle/deformable_detr/deformable_detr_r50_1xb2-15e_mnm.py \
+    --config configs/detr/detr_r50_8xb2-150e_coco.py \
     --search-space examples/ray_tune_search_space.yaml \
     --num-samples 50 \
     --scheduler asha \
@@ -90,7 +90,7 @@ python tools/train_ray.py \
 #### Single Training Run (No Tuning)
 ```bash
 python tools/train_ray.py \
-    --config configs/neurocle/deformable_detr/deformable_detr_r50_1xb2-15e_mnm.py \
+    --config configs/detr/detr_r50_8xb2-150e_coco.py \
     --single-run \
     --work-dir ./ray_work_dir
 ```
@@ -108,7 +108,7 @@ defaults:
   - _self_
 
 # Reference to MM config
-mm_config: ../../configs/neurocle/deformable_detr/deformable_detr_r50_1xb2-15e_mnm.py
+mm_config: ../../configs/detr/detr_r50_8xb2-150e_coco.py
 
 # Work directory with timestamp
 work_dir: ./work_dirs/my_exp/${now:%Y%m%d_%H%M%S}
@@ -227,7 +227,7 @@ search_space = {
 }
 
 wrapper = RayWrapper(
-    config_path='configs/neurocle/deformable_detr/deformable_detr_r50_1xb2-15e_mnm.py',
+    config_path='configs/detr/detr_r50_8xb2-150e_coco.py',
     search_space=search_space,
     num_samples=20,
     metric='coco/bbox_mAP',

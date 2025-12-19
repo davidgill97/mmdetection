@@ -6,7 +6,8 @@ This directory contains example configurations and usage demonstrations for the 
 
 - **`hydra_configs/`**: Example Hydra configuration files
   - `base_config.yaml`: Base Hydra configuration template
-  - `deformable_detr_mnm.yaml`: Example config for Deformable DETR training
+  - `detr_coco.yaml`: Example config for DETR training on COCO
+  - `mmseg_pspnet.yaml`: Example config for MMSegmentation PSPNet
 
 - **`ray_tune_search_space.yaml`**: Example search space for Ray Tune hyperparameter optimization
 
@@ -40,7 +41,7 @@ python tools/train_hydra.py \
 
 # Using MM config directly
 python tools/train_hydra.py \
-    --mm-config configs/neurocle/deformable_detr/deformable_detr_r50_1xb2-15e_mnm.py \
+    --mm-config configs/detr/detr_r50_8xb2-150e_coco.py \
     --work-dir ./work_dirs/test_hydra
 ```
 
@@ -49,13 +50,13 @@ python tools/train_hydra.py \
 ```bash
 # Single training run
 python tools/train_ray.py \
-    --config configs/neurocle/deformable_detr/deformable_detr_r50_1xb2-15e_mnm.py \
+    --config configs/detr/detr_r50_8xb2-150e_coco.py \
     --single-run \
     --work-dir ./work_dirs/test_ray
 
 # Hyperparameter tuning with custom search space
 python tools/train_ray.py \
-    --config configs/neurocle/deformable_detr/deformable_detr_r50_1xb2-15e_mnm.py \
+    --config configs/detr/detr_r50_8xb2-150e_coco.py \
     --search-space examples/ray_tune_search_space.yaml \
     --num-samples 10 \
     --gpus-per-trial 1

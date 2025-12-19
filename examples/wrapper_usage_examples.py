@@ -24,7 +24,7 @@ def example_hydra_wrapper():
     
     # Initialize wrapper with MM config directly
     wrapper = HydraWrapper(
-        config_path='configs/neurocle/deformable_detr/deformable_detr_r50_1xb2-15e_mnm.py',
+        config_path='projects/example_project/configs/faster-rcnn_dummy-resnet_fpn_1x_coco.py',
         config_name=None,  # No Hydra config, using MM config directly
         work_dir='./work_dirs/example_hydra'
     )

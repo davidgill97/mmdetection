@@ -34,7 +34,7 @@ Use the Hydra wrapper to train with existing MM configs:
 
 ```bash
 python tools/train_hydra.py \
-    --mm-config configs/neurocle/deformable_detr/deformable_detr_r50_1xb2-15e_mnm.py \
+    --mm-config configs/detr/detr_r50_8xb2-150e_coco.py \
     --work-dir ./work_dirs/my_first_training
 ```
 
@@ -62,7 +62,7 @@ pip install ray[tune]
 
 # Single training run
 python tools/train_ray.py \
-    --config configs/neurocle/deformable_detr/deformable_detr_r50_1xb2-15e_mnm.py \
+    --config configs/detr/detr_r50_8xb2-150e_coco.py \
     --single-run \
     --work-dir ./work_dirs/ray_training
 ```
@@ -88,7 +88,7 @@ python tools/train_ray.py \
 
 ```bash
 python tools/train_hydra.py \
-    --mm-config configs/neurocle/deformable_detr/deformable_detr_r50_1xb2-15e_mnm.py \
+    --mm-config configs/detr/detr_r50_8xb2-150e_coco.py \
     --overrides \
         optimizer.lr=0.0001 \
         data.train_batch_size=16 \
@@ -99,7 +99,7 @@ python tools/train_hydra.py \
 
 ```bash
 python tools/train_ray.py \
-    --config configs/neurocle/deformable_detr/deformable_detr_r50_1xb2-15e_mnm.py \
+    --config configs/detr/detr_r50_8xb2-150e_coco.py \
     --search-space examples/ray_tune_search_space.yaml \
     --num-samples 20 \
     --gpus-per-trial 1

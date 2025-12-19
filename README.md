@@ -108,6 +108,8 @@ MMDetection now includes a powerful wrapper system that integrates with **Hydra*
 - **📊 Wandb Logging**: Integrated experiment tracking and visualization
 - **🔄 MM Config Compatible**: Seamlessly works with existing MM configs
 - **🌐 Multi-Library Support**: Extensible to other MM libraries (mmseg, mmcls, etc.)
+- **🚀 Multi-GPU Training**: Full distributed training support
+- **📦 Export Support**: Integration with MMDeploy for ONNX/TensorRT export
 
 ### Quick Start
 
@@ -115,12 +117,18 @@ MMDetection now includes a powerful wrapper system that integrates with **Hydra*
 # Training with Hydra wrapper
 python tools/train_hydra.py --mm-config configs/detr/detr_r50_8xb2-150e_coco.py
 
+# Multi-GPU training
+python -m torch.distributed.launch --nproc_per_node=4 \
+    tools/train_hydra.py --mm-config configs/detr/detr_r50_8xb2-150e_coco.py \
+    --launcher pytorch
+
 # Hyperparameter tuning with Ray
 python tools/train_ray.py --config configs/detr/detr_r50_8xb2-150e_coco.py --num-samples 20
 
 # See full documentation
 # - Quick Start: docs/QUICKSTART_WRAPPER.md
 # - Full Guide: docs/WRAPPER_GUIDE.md
+# - Multi-GPU & Export: docs/MULTI_GPU_AND_EXPORT.md
 # - Examples: examples/wrapper_usage_examples.py
 ```
 

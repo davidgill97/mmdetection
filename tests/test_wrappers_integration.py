@@ -27,7 +27,7 @@ def test_hydra_wrapper_with_mm_config():
         # Create temporary work directory
         with tempfile.TemporaryDirectory() as tmpdir:
             wrapper = HydraWrapper(
-                config_path='configs/neurocle/deformable_detr/deformable_detr_r50_1xb2-15e_mnm.py',
+                config_path='projects/example_project/configs/faster-rcnn_dummy-resnet_fpn_1x_coco.py',
                 config_name=None,
                 work_dir=tmpdir
             )
@@ -102,7 +102,7 @@ def test_config_manager():
         print("✓ ConfigManager created for mmdet")
         
         # Test loading config
-        config = manager.load_config('configs/neurocle/deformable_detr/deformable_detr_r50_1xb2-15e_mnm.py')
+        config = manager.load_config('projects/example_project/configs/faster-rcnn_dummy-resnet_fpn_1x_coco.py')
         print("✓ Config loaded via ConfigManager")
         
         # Test validation
@@ -150,7 +150,7 @@ def test_ray_wrapper_setup():
             }
             
             wrapper = RayWrapper(
-                config_path='configs/neurocle/deformable_detr/deformable_detr_r50_1xb2-15e_mnm.py',
+                config_path='projects/example_project/configs/faster-rcnn_dummy-resnet_fpn_1x_coco.py',
                 work_dir=tmpdir,
                 search_space=search_space,
                 num_samples=5,
@@ -205,7 +205,7 @@ def test_hydra_optional():
         # Test that HydraWrapper works without Hydra for MM configs
         with tempfile.TemporaryDirectory() as tmpdir:
             wrapper = HydraWrapper(
-                config_path='configs/neurocle/deformable_detr/deformable_detr_r50_1xb2-15e_mnm.py',
+                config_path='projects/example_project/configs/faster-rcnn_dummy-resnet_fpn_1x_coco.py',
                 config_name=None,  # No Hydra config
                 work_dir=tmpdir
             )

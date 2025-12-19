@@ -133,7 +133,7 @@ This implementation adds a comprehensive wrapper system to mmdetection that inte
 ```bash
 # With MM config directly (no Hydra needed)
 python tools/train_hydra.py \
-    --mm-config configs/neurocle/deformable_detr/deformable_detr_r50_1xb2-15e_mnm.py \
+    --mm-config configs/detr/detr_r50_8xb2-150e_coco.py \
     --work-dir ./work_dirs/my_exp
 
 # With Hydra config (requires Hydra installation)
@@ -147,12 +147,12 @@ python tools/train_hydra.py \
 ```bash
 # Single training run
 python tools/train_ray.py \
-    --config configs/neurocle/deformable_detr/deformable_detr_r50_1xb2-15e_mnm.py \
+    --config configs/detr/detr_r50_8xb2-150e_coco.py \
     --single-run
 
 # Hyperparameter tuning
 python tools/train_ray.py \
-    --config configs/neurocle/deformable_detr/deformable_detr_r50_1xb2-15e_mnm.py \
+    --config configs/detr/detr_r50_8xb2-150e_coco.py \
     --search-space examples/ray_tune_search_space.yaml \
     --num-samples 20
 ```

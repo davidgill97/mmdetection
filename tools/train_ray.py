@@ -7,15 +7,15 @@ enables scalable hyperparameter tuning with various search algorithms.
 
 Example usage:
     # Basic hyperparameter tuning
-    python tools/train_ray.py --config configs/neurocle/detr/detr_r50_1xb2-15e_mnm.py \
+    python tools/train_ray.py --config configs/detr/detr_r50_8xb2-150e_coco.py \
         --num-samples 20 --metric coco/bbox_mAP
     
     # With custom search space
-    python tools/train_ray.py --config configs/neurocle/detr/detr_r50_1xb2-15e_mnm.py \
+    python tools/train_ray.py --config configs/detr/detr_r50_8xb2-150e_coco.py \
         --search-space search_space.yaml --num-samples 50
     
     # Single training without tuning
-    python tools/train_ray.py --config configs/neurocle/detr/detr_r50_1xb2-15e_mnm.py \
+    python tools/train_ray.py --config configs/detr/detr_r50_8xb2-150e_coco.py \
         --single-run
 """
 
