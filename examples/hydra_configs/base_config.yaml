@@ -1,0 +1,55 @@
+# Base Hydra configuration for mmdetection training
+# This configuration can be easily extended and composed with other configs
+
+defaults:
+  - _self_
+
+# Reference to MM config file
+mm_config: null  # Set this to your MM config path
+
+# Work directory for outputs
+work_dir: ./work_dirs/${now:%Y-%m-%d}/${now:%H-%M-%S}
+
+# Weights & Biases configuration
+wandb:
+  project: mmdetection
+  entity: null  # Set to your wandb entity/team
+  name: ${now:%Y%m%d_%H%M%S}
+  tags:
+    - training
+    - mmdetection
+  group: null
+  job_type: train
+  notes: null
+  config: {}  # Additional config to log
+
+# Training overrides
+train:
+  max_epochs: null  # Will use config default if not set
+  val_interval: null
+  
+# Optimizer overrides
+optimizer:
+  lr: null  # Learning rate override
+  weight_decay: null
+  
+# Data loader overrides
+data:
+  train_batch_size: null
+  val_batch_size: null
+  num_workers: null
+
+# Model overrides
+model:
+  # Add model-specific overrides here
+  num_classes: null
+
+# Enable automatic mixed precision
+amp: false
+
+# Distributed training
+launcher: none  # none, pytorch, slurm, mpi
+
+# Resume training
+resume: false
+load_from: null
