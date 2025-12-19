@@ -18,6 +18,8 @@ try:
     HYDRA_AVAILABLE = True
 except ImportError:
     HYDRA_AVAILABLE = False
+    # Create dummy types for type hints when Hydra is not installed
+    DictConfig = dict
 
 
 class HydraWrapper(BaseWrapper):
@@ -45,18 +47,19 @@ class HydraWrapper(BaseWrapper):
         version_base: Optional[str] = None,
         **kwargs
     ):
-        if not HYDRA_AVAILABLE:
-            raise ImportError(
-                "Hydra is not installed. Please install it with: "
-                "pip install hydra-core"
-            )
-        
         super().__init__(config_path, work_dir, **kwargs)
         self.config_name = config_name
         self.overrides = overrides or []
         self.version_base = version_base
         self._hydra_cfg = None
         self.is_hydra_config = config_name is not None
+        
+        # Only check for Hydra if trying to use Hydra config
+        if self.is_hydra_config and not HYDRA_AVAILABLE:
+            raise ImportError(
+                "Hydra is not installed. Please install it with: "
+                "pip install hydra-core"
+            )
         
     def load_config(self) -> Config:
         """Load configuration using Hydra or MM config system.
