@@ -165,13 +165,14 @@ class ConfigManager:
     """Manager class for handling multiple MM library configurations.
     
     Provides utilities for managing configs across mmdetection, mmsegmentation,
-    mmclassification, and other MM libraries.
+    mmpretrain (mmclassification), and other MM libraries.
     """
     
     SUPPORTED_LIBRARIES = [
         'mmdet',
         'mmseg',
-        'mmcls',
+        'mmcls',  # Legacy name, use mmpretrain
+        'mmpretrain',
         'mmpose',
         'mmaction',
         'mmocr',
@@ -182,7 +183,7 @@ class ConfigManager:
         """Initialize ConfigManager.
         
         Args:
-            library (str): MM library name (e.g., 'mmdet', 'mmseg').
+            library (str): MM library name (e.g., 'mmdet', 'mmseg', 'mmpretrain').
         """
         if library not in self.SUPPORTED_LIBRARIES:
             raise ValueError(

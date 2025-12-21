@@ -1,6 +1,6 @@
 # Extending MM Wrapper System to Other MM Libraries
 
-This guide shows how to use the wrapper system with other MM libraries like mmsegmentation, mmclassification, etc.
+This guide shows how to use the wrapper system with other MM libraries like mmsegmentation, mmpretrain (classification), mmpose, etc.
 
 ## Overview
 
@@ -10,7 +10,8 @@ The wrapper system is designed to work with any MM library that uses mmengine an
 
 - `mmdet` - Object Detection (already integrated)
 - `mmseg` - Semantic Segmentation
-- `mmcls` - Image Classification
+- `mmcls` - Image Classification (legacy name)
+- `mmpretrain` - Image Classification (new name, replaces mmcls)
 - `mmpose` - Pose Estimation
 - `mmaction` - Action Recognition
 - `mmocr` - Optical Character Recognition
@@ -28,10 +29,10 @@ python tools/train_hydra.py \
     --mm-config /path/to/mmsegmentation/configs/pspnet/pspnet_r50-d8_4xb2-40k_cityscapes-512x1024.py \
     --work-dir ./work_dirs/mmseg_training
 
-# For mmclassification
+# For mmpretrain (classification)
 python tools/train_hydra.py \
-    --mm-config /path/to/mmclassification/configs/resnet/resnet50_8xb32_in1k.py \
-    --work-dir ./work_dirs/mmcls_training
+    --mm-config /path/to/mmpretrain/configs/resnet/resnet50_8xb32_in1k.py \
+    --work-dir ./work_dirs/mmpretrain_training
 ```
 
 ### Method 2: Using ConfigManager
@@ -98,23 +99,24 @@ data:
   val_batch_size: 1
 ```
 
-#### Example: MMClassification Config
+#### Example: MMPretrain (Classification) Config
 
 ```yaml
-# examples/hydra_configs/mmcls_resnet.yaml
+# examples/hydra_configs/mmpretrain_resnet50.yaml
 defaults:
   - _self_
 
-mm_config: /path/to/mmclassification/configs/resnet/resnet50_8xb32_in1k.py
+mm_config: /path/to/mmpretrain/configs/resnet/resnet50_8xb32_in1k.py
 
-work_dir: ./work_dirs/mmcls_resnet/${now:%Y%m%d_%H%M%S}
+work_dir: ./work_dirs/mmpretrain_resnet/${now:%Y%m%d_%H%M%S}
 
 wandb:
-  project: mmclassification
+  project: mmpretrain
   name: resnet50_imagenet
   tags:
     - resnet50
     - imagenet
+    - classification
 
 optimizer:
   lr: 0.1
@@ -135,11 +137,11 @@ python tools/train_ray.py \
     --metric mIoU \
     --mode max
 
-# Hyperparameter tuning for mmclassification
+# Hyperparameter tuning for mmpretrain (classification)
 python tools/train_ray.py \
-    --config /path/to/mmclassification/configs/resnet/resnet50_8xb32_in1k.py \
+    --config /path/to/mmpretrain/configs/resnet/resnet50_8xb32_in1k.py \
     --num-samples 15 \
-    --metric accuracy \
+    --metric accuracy/top1 \
     --mode max
 ```
 
@@ -183,9 +185,9 @@ det_wrapper.train()
 seg_wrapper = HydraWrapper(config_path='path/to/mmseg/config.py')
 seg_wrapper.train()
 
-# Classification
-cls_wrapper = HydraWrapper(config_path='path/to/mmcls/config.py')
-cls_wrapper.train()
+# Classification (mmpretrain)
+pretrain_wrapper = HydraWrapper(config_path='path/to/mmpretrain/config.py')
+pretrain_wrapper.train()
 ```
 
 ### 2. Unified Experiment Tracking
@@ -231,22 +233,110 @@ train_dataloader.batch_size:
 ## Library-Specific Considerations
 
 ### MMSegmentation
-- Use `mIoU` as primary metric
+- Use `mIoU` (mean Intersection over Union) as primary metric
 - Typically uses iteration-based training (not epochs)
 - May require larger batch sizes for stable training
+- Common models: PSPNet, DeepLabV3, SegFormer
 
-### MMClassification
-- Use `accuracy` or `top-k accuracy` as metrics
+### MMPretrain (Classification)
+- Replaces mmclassification (use `mmpretrain` for new projects)
+- Use `accuracy/top1` or `accuracy/top5` as metrics
 - Usually uses epoch-based training
-- Consider learning rate warmup
+- Consider learning rate warmup for large batch sizes
+- Common models: ResNet, Vision Transformer, Swin Transformer
 
 ### MMPose
 - Use `PCK` (Percentage of Correct Keypoints) as metric
 - May require specific data augmentation
+- Common models: HRNet, SimCC
 
 ### MMTracking
 - Use `MOTA` (Multiple Object Tracking Accuracy) as metric
 - Requires video datasets
+- Common models: ByteTrack, SORT
+
+## Complete Examples
+
+### Example 1: MMSegmentation with Multi-GPU
+
+```python
+from mmdet.wrappers import HydraWrapper
+
+# Create wrapper for PSPNet segmentation
+wrapper = HydraWrapper(
+    config_path='/path/to/mmsegmentation/configs/pspnet/pspnet_r50-d8_4xb2-40k_cityscapes-512x1024.py',
+    work_dir='./work_dirs/mmseg_training'
+)
+
+# Load config
+config = wrapper.load_config()
+
+# Configure for multi-GPU training
+config.launcher = 'pytorch'
+config.train_dataloader.batch_size = 2  # Per GPU
+
+# Launch with: python -m torch.distributed.launch --nproc_per_node=4
+results = wrapper.train(config)
+```
+
+### Example 2: MMPretrain for Image Classification
+
+```python
+from mmdet.wrappers import HydraWrapper
+
+# Create wrapper for ResNet50 classification
+wrapper = HydraWrapper(
+    config_path='/path/to/mmpretrain/configs/resnet/resnet50_8xb32_in1k.py',
+    work_dir='./work_dirs/mmpretrain_training'
+)
+
+# Load and configure
+config = wrapper.load_config()
+
+# Override for custom dataset
+config = wrapper.merge_config({
+    'data_root': '/path/to/your/dataset',
+    'train_dataloader': {
+        'dataset': {
+            'data_prefix': 'train',
+            'ann_file': 'train.txt'
+        }
+    },
+    'val_dataloader': {
+        'dataset': {
+            'data_prefix': 'val',
+            'ann_file': 'val.txt'
+        }
+    }
+})
+
+results = wrapper.train(config)
+```
+
+### Example 3: Combined Detection and Segmentation
+
+```python
+from mmdet.wrappers import HydraWrapper, ConfigManager
+
+# Train detection model
+det_manager = ConfigManager(library='mmdet')
+det_wrapper = HydraWrapper(
+    config_path='path/to/mmdet/detr_config.py',
+    work_dir='./work_dirs/detection'
+)
+det_results = det_wrapper.train()
+
+# Train segmentation model
+seg_manager = ConfigManager(library='mmseg')
+seg_wrapper = HydraWrapper(
+    config_path='path/to/mmseg/pspnet_config.py',
+    work_dir='./work_dirs/segmentation'
+)
+seg_results = seg_wrapper.train()
+
+print(f"Detection mAP: {det_results.get('mAP', 'N/A')}")
+print(f"Segmentation mIoU: {seg_results.get('mIoU', 'N/A')}")
+```
 
 ## Best Practices
 
@@ -255,11 +345,14 @@ train_dataloader.batch_size:
 3. **Use consistent wandb projects**: One project per MM library for better organization
 4. **Document library-specific settings**: Comment on library-specific parameters
 5. **Test with small datasets first**: Verify setup before full training
+6. **Use mmpretrain instead of mmcls**: For new classification projects
 
 ## Examples
 
 See the `examples/` directory for more examples:
 - `examples/hydra_configs/` - Hydra configuration templates
+  - `mmseg_pspnet.yaml` - MMSegmentation example
+  - `mmpretrain_resnet50.yaml` - MMPretrain example
 - `examples/wrapper_usage_examples.py` - Programmatic usage examples
 
 ## Need Help?

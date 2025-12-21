@@ -156,22 +156,34 @@ torch2onnx(
 
 ### Exporting to TensorRT
 
-For maximum inference speed on NVIDIA GPUs:
+For maximum inference speed on NVIDIA GPUs, first export to ONNX then convert to TensorRT:
 
 ```python
-from mmdeploy.apis import torch2tensorrt
+from mmdeploy.apis import torch2onnx, onnx2tensorrt
 
-# Export to TensorRT
-work_dir = './work_dirs/detr_tensorrt'
+# Step 1: Export to ONNX
+work_dir_onnx = './work_dirs/detr_onnx'
 checkpoint = './work_dirs/detr_training/latest.pth'
 
-torch2tensorrt(
+torch2onnx(
     img='demo/demo.jpg',
-    work_dir=work_dir,
-    save_file='end2end.engine',
-    deploy_cfg='configs/mmdeploy/detection_tensorrt_dynamic-320x320-1344x1344.py',
+    work_dir=work_dir_onnx,
+    save_file='end2end.onnx',
+    deploy_cfg='configs/mmdeploy/detection_onnxruntime_dynamic.py',
     model_cfg=config,
     model_checkpoint=checkpoint,
+    device='cuda:0'
+)
+
+# Step 2: Convert ONNX to TensorRT
+work_dir_trt = './work_dirs/detr_tensorrt'
+
+onnx2tensorrt(
+    work_dir=work_dir_trt,
+    save_file='end2end.engine',
+    model_id=0,
+    deploy_cfg='configs/mmdeploy/detection_tensorrt_dynamic-320x320-1344x1344.py',
+    onnx_model=f'{work_dir_onnx}/end2end.onnx',
     device='cuda:0'
 )
 ```
@@ -224,7 +236,7 @@ When training models for export, consider:
 
 ```python
 from mmdet.wrappers import HydraWrapper
-from mmdeploy.apis import torch2onnx
+from mmdeploy.apis import torch2onnx, onnx2tensorrt
 
 # 1. Train with multi-GPU
 wrapper = HydraWrapper(
@@ -249,6 +261,16 @@ torch2onnx(
     deploy_cfg='configs/mmdeploy/detection_onnxruntime_dynamic.py',
     model_cfg=config,
     model_checkpoint=best_checkpoint,
+    device='cuda:0'
+)
+
+# 3. (Optional) Convert ONNX to TensorRT for faster inference
+onnx2tensorrt(
+    work_dir='./work_dirs/exported_model',
+    save_file='model.engine',
+    model_id=0,
+    deploy_cfg='configs/mmdeploy/detection_tensorrt_dynamic-320x320-1344x1344.py',
+    onnx_model='./work_dirs/exported_model/model.onnx',
     device='cuda:0'
 )
 

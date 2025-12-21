@@ -111,7 +111,7 @@ def test_config_manager():
         print("✓ Config validation successful")
         
         # Test other libraries
-        for lib in ['mmseg', 'mmcls', 'mmpose']:
+        for lib in ['mmseg', 'mmcls', 'mmpretrain', 'mmpose']:
             mgr = ConfigManager(library=lib)
             assert mgr.library == lib, f"Library should be '{lib}'"
             print(f"✓ ConfigManager created for {lib}")

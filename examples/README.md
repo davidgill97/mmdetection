@@ -8,6 +8,7 @@ This directory contains example configurations and usage demonstrations for the 
   - `base_config.yaml`: Base Hydra configuration template
   - `detr_coco.yaml`: Example config for DETR training on COCO
   - `mmseg_pspnet.yaml`: Example config for MMSegmentation PSPNet
+  - `mmpretrain_resnet50.yaml`: Example config for MMPretrain ResNet50
 
 - **`custom_dataset/`**: **NEW** Complete examples for custom datasets
   - `README.md`: Comprehensive guide for custom dataset training
