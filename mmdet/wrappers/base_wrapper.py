@@ -101,3 +101,43 @@ class BaseWrapper(ABC):
         # Merge with new config
         mm_cfg.merge_from_dict(config)
         return mm_cfg
+    
+    def configure_metrics(
+        self,
+        config: Config,
+        metric_type: str = 'bbox',
+        classwise: bool = True,
+        iou_thrs: Optional[list] = None,
+        metric_items: Optional[list] = None
+    ) -> Config:
+        """Configure evaluation metrics for the config.
+        
+        This is a convenience method to easily override evaluation metrics.
+        
+        Args:
+            config (Config): Configuration object to modify.
+            metric_type (str): Type of metric ('bbox', 'segm', or list of both).
+            classwise (bool): Whether to compute per-class metrics.
+            iou_thrs (Optional[list]): List of IoU thresholds. If None, uses default.
+            metric_items (Optional[list]): List of metric items to report.
+            
+        Returns:
+            Config: Configuration with updated metrics.
+        """
+        metric_config = {
+            'type': 'CocoMetric',
+            'metric': metric_type,
+            'classwise': classwise
+        }
+        
+        if iou_thrs is not None:
+            metric_config['iou_thrs'] = iou_thrs
+        
+        if metric_items is not None:
+            metric_config['metric_items'] = metric_items
+        
+        # Update both val and test evaluators
+        config.val_evaluator = metric_config.copy()
+        config.test_evaluator = metric_config.copy()
+        
+        return config

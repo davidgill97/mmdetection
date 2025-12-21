@@ -9,6 +9,14 @@ This directory contains example configurations and usage demonstrations for the 
   - `detr_coco.yaml`: Example config for DETR training on COCO
   - `mmseg_pspnet.yaml`: Example config for MMSegmentation PSPNet
 
+- **`custom_dataset/`**: **NEW** Complete examples for custom datasets
+  - `README.md`: Comprehensive guide for custom dataset training
+  - `1_basic_custom_dataset.py`: Basic training example
+  - `2_custom_metrics.py`: Custom metrics configuration
+  - `3_multi_gpu_training.py`: Multi-GPU distributed training
+  - `4_hyperparameter_tuning.py`: Ray Tune optimization
+  - `configs/`: Hydra configs for custom datasets
+
 - **`ray_tune_search_space.yaml`**: Example search space for Ray Tune hyperparameter optimization
 
 - **`wrapper_usage_examples.py`**: Demonstration script showing programmatic usage of wrappers
@@ -31,7 +39,35 @@ This script demonstrates:
 - Multi-library support with ConfigManager
 - Setting up Ray Tune
 
-### 2. Train with Hydra Config
+### 2. Custom Dataset Training
+
+For complete custom dataset training examples, see the `custom_dataset/` directory:
+
+```bash
+# Basic training
+python examples/custom_dataset/1_basic_custom_dataset.py \
+    --data-root /path/to/your/data \
+    --work-dir ./work_dirs/custom
+
+# Custom metrics
+python examples/custom_dataset/2_custom_metrics.py \
+    --data-root /path/to/your/data
+
+# Multi-GPU training (4 GPUs)
+python -m torch.distributed.launch --nproc_per_node=4 \
+    examples/custom_dataset/3_multi_gpu_training.py \
+    --data-root /path/to/your/data \
+    --launcher pytorch
+
+# Hyperparameter tuning
+python examples/custom_dataset/4_hyperparameter_tuning.py \
+    --data-root /path/to/your/data \
+    --num-samples 20
+```
+
+See `custom_dataset/README.md` for detailed documentation.
+
+### 3. Train with Hydra Config
 
 ```bash
 # Using Hydra config
@@ -45,7 +81,7 @@ python tools/train_hydra.py \
     --work-dir ./work_dirs/test_hydra
 ```
 
-### 3. Hyperparameter Tuning with Ray
+### 4. Hyperparameter Tuning with Ray
 
 ```bash
 # Single training run
