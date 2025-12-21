@@ -1,0 +1,47 @@
+# Example Hydra config for MMPretrain (Image Classification)
+
+defaults:
+  - base_config
+  - _self_
+
+# MM config for ResNet50 classification (example path - adjust to actual mmpretrain installation)
+mm_config: /path/to/mmpretrain/configs/resnet/resnet50_8xb32_in1k.py
+
+# Work directory
+work_dir: ./work_dirs/mmpretrain_resnet50/${now:%Y%m%d_%H%M%S}
+
+# Wandb configuration
+wandb:
+  project: mmpretrain
+  name: resnet50_imagenet_${now:%Y%m%d_%H%M%S}
+  tags:
+    - resnet50
+    - imagenet
+    - classification
+  group: classification_experiments
+
+# Training settings
+train:
+  max_epochs: 100
+  val_interval: 10
+
+# Optimizer settings
+optimizer:
+  lr: 0.1
+  weight_decay: 0.0001
+
+# Data settings
+data:
+  train_batch_size: 32
+  val_batch_size: 32
+  num_workers: 4
+
+# Enable AMP for faster training
+amp: true
+
+# Launcher for distributed training
+launcher: none
+
+# Multi-GPU configuration
+# For 8 GPUs with batch_size=32 per GPU: effective batch size = 256
+# Standard ImageNet training uses batch size of 256

@@ -1,0 +1,54 @@
+# Custom Metrics Configuration
+# This configuration shows how to override evaluation metrics
+
+defaults:
+  - custom_dataset_base
+  - _self_
+
+# Override evaluation metrics with custom configuration
+val_evaluator:
+  type: CocoMetric
+  metric: [bbox, segm]  # Compute both bbox and segmentation metrics
+  ann_file: ${data_root}/${ann_file_val}
+  classwise: true       # Enable per-class metrics
+  
+  # Custom IoU thresholds for evaluation
+  iou_thrs: [0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95]
+  
+  # Specify which metrics to report
+  metric_items: 
+    - mAP          # Mean Average Precision
+    - mAP_50       # AP at IoU=0.50
+    - mAP_75       # AP at IoU=0.75
+    - mAP_s        # AP for small objects
+    - mAP_m        # AP for medium objects
+    - mAP_l        # AP for large objects
+  
+  # Proposal numbers for Average Recall calculation
+  proposal_nums: [100, 300, 1000]
+
+# Test evaluator with additional options
+test_evaluator:
+  type: CocoMetric
+  metric: bbox
+  ann_file: ${data_root}/${ann_file_val}
+  classwise: true
+  format_only: false  # Set to true to only save results without evaluation
+  outfile_prefix: ./results/custom_dataset  # Prefix for output files
+
+# Example: Multiple evaluators for different metrics
+# Uncomment to use multiple evaluators simultaneously
+# val_evaluator:
+#   - type: CocoMetric
+#     metric: bbox
+#     ann_file: ${data_root}/${ann_file_val}
+#     classwise: true
+#   - type: VOCMetric
+#     metric: mAP
+#     iou_thr: 0.5
+
+# Example: Custom class names for better metric reporting
+# train_dataloader:
+#   dataset:
+#     metainfo:
+#       classes: ['person', 'vehicle', 'animal', 'object']

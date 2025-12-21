@@ -1,0 +1,17 @@
+# Requirements for MM Wrapper System
+# Install with: pip install -r requirements/wrapper.txt
+
+# Hydra support for hierarchical configuration
+hydra-core>=1.3.0
+omegaconf>=2.3.0
+
+# Ray Tune for hyperparameter optimization
+ray[tune]>=2.0.0
+hyperopt>=0.2.7
+
+# Wandb for experiment tracking (usually already installed)
+wandb>=0.15.0
+
+# Optional: Advanced search algorithms
+# bayesian-optimization>=1.4.0
+# optuna>=3.0.0

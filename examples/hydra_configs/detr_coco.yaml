@@ -1,0 +1,52 @@
+# Example Hydra config for DETR training on COCO dataset
+
+defaults:
+  - base_config
+  - _self_
+
+# MM config for DETR
+mm_config: ../../configs/detr/detr_r50_8xb2-150e_coco.py
+
+# Work directory
+work_dir: ./work_dirs/detr_coco/${now:%Y%m%d_%H%M%S}
+
+# Wandb configuration
+wandb:
+  project: mmdetection
+  name: detr_coco_${now:%Y%m%d_%H%M%S}
+  tags:
+    - detr
+    - coco
+    - detection
+  group: detr_experiments
+
+# Training settings
+train:
+  max_epochs: 150
+  val_interval: 10
+
+# Optimizer settings
+optimizer:
+  lr: 1.0e-4
+  weight_decay: 1.0e-4
+
+# Data settings
+data:
+  train_batch_size: 2
+  val_batch_size: 2
+  num_workers: 2
+
+# Model settings
+model:
+  num_classes: 80
+
+# Enable AMP for faster training
+amp: false
+
+# Launcher for distributed training (none, pytorch, slurm, mpi)
+launcher: none
+
+# Multi-GPU training configuration
+# Set launcher to 'pytorch' for distributed training
+# Adjust batch_size per GPU and number of GPUs accordingly
+# Example for 4 GPUs: train_batch_size=2 means 2*4=8 total batch size

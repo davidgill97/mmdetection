@@ -99,6 +99,47 @@ The main branch works with **PyTorch 1.8+**.
 
 Apart from MMDetection, we also released [MMEngine](https://github.com/open-mmlab/mmengine) for model training and [MMCV](https://github.com/open-mmlab/mmcv) for computer vision research, which are heavily depended on by this toolbox.
 
+## 🎯 Hydra & Ray Wrapper System with Auto-Tuning
+
+MMDetection now includes a powerful wrapper system that integrates with **Hydra** and **Ray Tune** for advanced configuration management and hyperparameter optimization, plus **automatic batch size and learning rate tuning**:
+
+- **🤖 Auto-Tuning**: Automatic batch size and learning rate optimization based on GPU memory
+- **🔧 Hydra Integration**: Hierarchical configuration composition with easy parameter overrides
+- **⚡ Ray Tune Support**: Scalable hyperparameter optimization with multiple search algorithms
+- **📊 Wandb Logging**: Integrated experiment tracking and visualization
+- **🔄 MM Config Compatible**: Seamlessly works with existing MM configs
+- **🌐 Multi-Library Support**: Extensible to other MM libraries (mmseg, mmpretrain, etc.)
+- **🚀 Multi-GPU Training**: Full distributed training support with automatic LR scaling
+- **📦 Export Support**: Integration with MMDeploy for ONNX/TensorRT export
+
+### Quick Start
+
+```bash
+# Simplest: Automatic batch size and LR tuning (NEW!)
+python tools/train_auto.py configs/detr/detr_r50_8xb2-150e_coco.py --auto-batch --auto-scale-lr
+
+# Multi-GPU with automatic tuning
+python -m torch.distributed.launch --nproc_per_node=4 \
+    tools/train_auto.py configs/detr/detr_r50_8xb2-150e_coco.py \
+    --auto-batch --auto-scale-lr --amp
+
+# Training with Hydra wrapper
+python tools/train_hydra.py --mm-config configs/detr/detr_r50_8xb2-150e_coco.py
+
+# Hyperparameter tuning with Ray
+python tools/train_ray.py --config configs/detr/detr_r50_8xb2-150e_coco.py --num-samples 20
+
+# See full documentation
+# - Auto-Tuning Guide: docs/AUTO_TUNING_GUIDE.md (NEW!)
+# - Quick Start: docs/QUICKSTART_WRAPPER.md
+# - Full Guide: docs/WRAPPER_GUIDE.md
+# - Multi-GPU & Export: docs/MULTI_GPU_AND_EXPORT.md
+# - Custom Datasets: examples/custom_dataset/README.md
+# - Examples: examples/wrapper_usage_examples.py
+```
+
+See [Auto-Tuning Guide](docs/AUTO_TUNING_GUIDE.md) and [Quick Start Guide](docs/QUICKSTART_WRAPPER.md) for detailed instructions.
+
 ## What's New
 
 💎 **We have released the pre-trained weights for MM-Grounding-DINO Swin-B and Swin-L, welcome to try and give feedback.**

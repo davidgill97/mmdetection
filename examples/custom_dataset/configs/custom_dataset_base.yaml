@@ -1,0 +1,65 @@
+# Custom Dataset Base Configuration
+# This is a base configuration for training on custom datasets
+
+defaults:
+  - ../../hydra_configs/base_config
+  - _self_
+
+# Base MM config (choose one that fits your task)
+mm_config: ../../../configs/detr/detr_r50_8xb2-150e_coco.py
+
+# Dataset configuration
+data_root: /path/to/your/data
+ann_file_train: annotations/train.json
+ann_file_val: annotations/val.json
+
+# Number of classes in your dataset
+num_classes: 10
+
+# Work directory
+work_dir: ./work_dirs/custom_dataset/${now:%Y%m%d_%H%M%S}
+
+# Wandb configuration
+wandb:
+  project: custom_dataset
+  name: training_${now:%Y%m%d_%H%M%S}
+  tags:
+    - custom_dataset
+    - detection
+
+# Training settings
+train:
+  max_epochs: 100
+  val_interval: 10
+
+# Optimizer settings
+optimizer:
+  lr: 0.0001
+  weight_decay: 0.0001
+
+# Data settings
+data:
+  train_batch_size: 2
+  val_batch_size: 2
+  num_workers: 2
+
+# Model settings
+model:
+  num_classes: ${num_classes}
+
+# Evaluation metrics (basic configuration)
+val_evaluator:
+  type: CocoMetric
+  metric: bbox
+  ann_file: ${data_root}/${ann_file_val}
+
+test_evaluator:
+  type: CocoMetric
+  metric: bbox
+  ann_file: ${data_root}/${ann_file_val}
+
+# Enable AMP for faster training
+amp: false
+
+# Launcher
+launcher: none

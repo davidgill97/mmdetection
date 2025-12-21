@@ -1,0 +1,62 @@
+# Multi-GPU Training Configuration
+# Configuration for distributed training on multiple GPUs
+
+defaults:
+  - custom_dataset_base
+  - _self_
+
+# Launcher for distributed training
+launcher: pytorch
+
+# Batch size per GPU (total batch size = batch_size * num_gpus)
+data:
+  train_batch_size: 4  # With 4 GPUs = 16 total batch size
+  val_batch_size: 4
+  num_workers: 4       # Workers per GPU
+
+# Learning rate scaling for multi-GPU training
+# Rule of thumb: lr_new = lr_base * (total_batch_size / base_batch_size)
+# Example: base_lr=0.0001 for batch_size=2, with 4 GPUs (batch_size=4 per GPU)
+#          total_batch_size=16, base_batch_size=2
+#          new_lr = 0.0001 * (16 / 2) = 0.0008
+optimizer:
+  lr: 0.0008  # Scaled for 4 GPUs with batch_size=4 per GPU
+  weight_decay: 0.0001
+
+# Enable mixed precision training for faster training
+amp: true
+
+# Sync batch normalization across GPUs
+# Uncomment if your model uses batch normalization
+# model:
+#   backbone:
+#     norm_cfg:
+#       type: SyncBN
+
+# Multi-GPU specific settings
+train_cfg:
+  max_epochs: 100
+  val_interval: 5  # Validate more frequently for large-scale training
+
+# Metrics configuration (same as single GPU)
+val_evaluator:
+  type: CocoMetric
+  metric: bbox
+  ann_file: ${data_root}/${ann_file_val}
+  classwise: true
+
+# Checkpoint configuration for multi-GPU
+# Checkpoints are saved only on rank 0 to avoid conflicts
+default_hooks:
+  checkpoint:
+    type: CheckpointHook
+    interval: 10
+    max_keep_ckpts: 3
+    save_best: auto
+    save_last: true
+
+# Note: Launch multi-GPU training with:
+# python -m torch.distributed.launch --nproc_per_node=4 \
+#     tools/train_hydra.py \
+#     --config-path ../examples/custom_dataset/configs \
+#     --config-name multi_gpu
